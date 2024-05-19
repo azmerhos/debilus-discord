@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const OWKey = "ecb581a494e3a4f27e66c29c72970b6f"
+const { OWtoken } = require('./config.json');
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,7 +41,7 @@ module.exports = {
 };
 
 const cityget = function(name) {
-    const cityRequest = new Request(`http://api.openweathermap.org/geo/1.0/direct?q=${name}&appid=${OWKey}`);
+    const cityRequest = new Request(`http://api.openweathermap.org/geo/1.0/direct?q=${name}&appid=${OWtoken}`);
     fetch(myRequest)
     .then((response) => {
         if (!response.ok) {
@@ -52,7 +53,7 @@ const cityget = function(name) {
 }
 
 const weatherget = function(lon, lat) {
-    const weatherRequest = new Request(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWKey}`);
+    const weatherRequest = new Request(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWtoken}`);
     fetch(myRequest)
     .then((response) => {
         if (!response.ok) {
