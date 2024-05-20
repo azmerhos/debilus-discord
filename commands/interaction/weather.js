@@ -23,18 +23,15 @@ module.exports = {
     const zipcode = interaction.options.getInteger("zipcode");
     const countryCode = interaction.options.getString("country_code");
     let data, pos, request;
-    if (!name) {
-        await interaction.reply({
-          content: `Incorrect input. Is your input correct ?`,
-          ephemeral: true,
-        });
-        return;
-      } 
-     else {
+    // Error gives more precise details to the user about what went wrong.
+    // Plus, this is a safeguard, I think the code is more readable and maintainable that way
+    // Also, interaction.reply dont have to be awaited.
+    if(!name) return interaction.reply({ content: "You seem to be missing the city. Please try again.", ephemeral: true});
+
       request = new Request(
         `http://api.openweathermap.org/geo/1.0/direct?q=${name}&appid=${OWtoken}`
       );
-    }
+    
     pos = await cityget(request);
     data = await weatherget(pos);
     await interaction.reply(
@@ -42,6 +39,10 @@ module.exports = {
     );
   },
 };
+
+// I like to define my function at the top of the file just after the async execute().
+// Node do it anyway (Function hoisting)
+// So this is good, Just not "optimized".
 
 const cityget = async function (request) {
   //async because we need to wait fetch result or else pos will be undefined
@@ -51,7 +52,11 @@ const cityget = async function (request) {
       // response = result of request
       if (!response.ok) {
         // not Status 200 ?
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        console.error(`HTTP status was not OK. ${response.status}`)
+        // Throwing the error would crash the shard (or the bot) which can be a pain to monitor.
+        // Use throw error only if the bot (or any app) SHOULD NOT be running if that went wrong.
+        // Add return to your error to stop the execution of this particular function without
+        // stopping the whole thing.
       }
       return response.json();
     })
@@ -70,7 +75,7 @@ const weatherget = async function (pos) {
   await fetch(weatherRequest)
     .then((response) => {
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+        console.error(`HTTP status was not OK. ${response.status}`)
       }
       return response.json();
     })
